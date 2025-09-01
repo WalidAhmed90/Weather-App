@@ -58,6 +58,7 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (_) => WeatherProvider(
             getWeather: getWeather,
+            box: weatherBox,
           ),
         ),
         ChangeNotifierProvider(

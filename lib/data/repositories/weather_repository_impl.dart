@@ -31,6 +31,7 @@ class WeatherRepositoryImpl implements WeatherRepository {
     } else {
       try {
         final localWeather = await localDataSource.getLastWeather();
+        localDataSource.setFromCache(true);
         return Right(localWeather.toEntity());
       } on CacheException {
         return Left(CacheFailure("No cached data available"));

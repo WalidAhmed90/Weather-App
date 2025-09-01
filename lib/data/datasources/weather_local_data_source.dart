@@ -5,6 +5,7 @@ import 'package:weather_app/data/models/weather_model.dart';
 abstract class WeatherLocalDataSource {
   Future<WeatherModel> getLastWeather();
   Future<void> cacheWeather(WeatherModel weatherToCache);
+  void setFromCache(bool fromCache);
 }
 
 class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
@@ -25,5 +26,10 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
   @override
   Future<void> cacheWeather(WeatherModel weatherToCache) async {
     await box.put('cached_weather', weatherToCache);
+  }
+
+  @override
+  void setFromCache(bool fromCache) {
+    box.put('from_cache', fromCache);
   }
 }
