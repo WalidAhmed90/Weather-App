@@ -23,6 +23,7 @@ class WeatherRepositoryImpl implements WeatherRepository {
     if (await networkInfo.isConnected) {
       try {
         final remoteWeather = await remoteDataSource.getWeather(city);
+        localDataSource.setFromCache(false);
         await localDataSource.cacheWeather(remoteWeather);
         return Right(remoteWeather.toEntity());
       } on ServerException catch (e) {

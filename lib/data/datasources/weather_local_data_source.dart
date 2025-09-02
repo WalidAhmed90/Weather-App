@@ -10,8 +10,9 @@ abstract class WeatherLocalDataSource {
 
 class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
   final Box box;
+  final Box cacheBox;
 
-  WeatherLocalDataSourceImpl({required this.box});
+  WeatherLocalDataSourceImpl({required this.box, required this.cacheBox});
 
   @override
   Future<WeatherModel> getLastWeather() async {
@@ -30,6 +31,6 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
 
   @override
   void setFromCache(bool fromCache) {
-    box.put('from_cache', fromCache);
+    cacheBox.put('from_cache', fromCache);
   }
 }

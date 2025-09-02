@@ -5,6 +5,7 @@ class AppConstants{
 
   static const String weatherBox = "weather_box";
   static const String settingBox = "setting_box";
+  static const String cacheBox = "cache_box";
 
 
 }

@@ -19,7 +19,6 @@ class WeatherProvider with ChangeNotifier {
   Future<void> fetchWeather(String city) async {
     isLoading = true;
     notifyListeners();
-    fromCache = box.get('from_cache', defaultValue: false);
 
     final Either<Failure, Weather> result = await getWeather(Params(city));
 
@@ -30,7 +29,7 @@ class WeatherProvider with ChangeNotifier {
       weather = data;
       errorMessage = null;
     });
-
+    fromCache = box.get('from_cache', defaultValue: false);
     isLoading = false;
     notifyListeners();
   }

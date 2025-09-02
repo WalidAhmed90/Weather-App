@@ -30,6 +30,8 @@ Future<void> main() async {
 
   // settings box for theme & units
   final settingsBox = await Hive.openBox(AppConstants.settingBox);
+  //Cache check box
+  final cacheBox = await Hive.openBox(AppConstants.cacheBox);
 
   // dependencies
   final connectivity = Connectivity();
@@ -42,7 +44,7 @@ Future<void> main() async {
     apiClient: client,
   );
 
-  final localDataSource = WeatherLocalDataSourceImpl(box: weatherBox);
+  final localDataSource = WeatherLocalDataSourceImpl(box: weatherBox, cacheBox: cacheBox);
 
   final repository = WeatherRepositoryImpl(
     remoteDataSource: remoteDataSource,
@@ -58,7 +60,8 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (_) => WeatherProvider(
             getWeather: getWeather,
-            box: weatherBox,
+            box: cacheBox,
+
           ),
         ),
         ChangeNotifierProvider(
