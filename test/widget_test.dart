@@ -6,12 +6,14 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:weather_app/presentation/providers/weather_provider.dart';
-import 'package:weather_app/presentation/providers/theme_provider.dart';
-import 'package:weather_app/presentation/providers/settings_provider.dart';
+import 'package:weather_app/domain/usecases/get_weather.dart';
+import 'package:weather_app/presentation/providers/weather_cubit.dart';
+import 'package:weather_app/presentation/providers/theme_cubit.dart';
+import 'package:weather_app/presentation/providers/settings_cubit.dart';
 
 import 'package:weather_app/main.dart';
 
@@ -19,15 +21,10 @@ void main() {
   testWidgets('Weather app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          // Override providers for testing
-          weatherBoxProvider.overrideWithValue(Hive.box('test_weather')),
-          themeBoxProvider.overrideWithValue(Hive.box('test_settings')),
-          settingsBoxProvider.overrideWithValue(Hive.box('test_settings')),
-        ],
-        child: const AppRoot(),
-      ),
+    MultiBlocProvider(providers: [
+      BlocProvider(create: (context) => ThemeCubit(Hive.box('test_setting'))),
+      BlocProvider(create: (context) => SettingsCubit(Hive.box('test_setting'))),
+    ], child: AppRoot())
     );
 
     // Verify that the app title is displayed

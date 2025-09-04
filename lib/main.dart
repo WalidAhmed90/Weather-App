@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:weather_app/presentation/providers/settings_provider.dart';
-import 'package:weather_app/presentation/providers/theme_provider.dart';
-import 'package:weather_app/presentation/providers/weather_provider.dart';
+import 'package:weather_app/presentation/providers/settings_cubit.dart';
+import 'package:weather_app/presentation/providers/theme_cubit.dart';
+import 'package:weather_app/presentation/providers/weather_cubit.dart';
 
 import 'core/constants.dart';
 import 'core/network/api_client.dart';
@@ -53,12 +54,11 @@ Future<void> main() async {
   final getWeather = GetWeather(repository);
 
   runApp(
-    ProviderScope(
-      overrides: [
-        weatherBoxProvider.overrideWithValue(cacheBox),
-        themeBoxProvider.overrideWithValue(settingsBox),
-        settingsBoxProvider.overrideWithValue(settingsBox),
-        getWeatherProvider.overrideWithValue(getWeather),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => WeatherCubit(getWeather: getWeather, box: cacheBox)),
+        BlocProvider(create: (context) => ThemeCubit(settingsBox)),
+        BlocProvider(create: (context) => SettingsCubit(settingsBox)),
       ],
       child: const AppRoot(),
     ),
@@ -70,7 +70,7 @@ class AppRoot extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+    final themeMode = context.read<ThemeCubit>().themeMode;
 
     return MaterialApp(
       title: 'Weather Pro',
@@ -78,7 +78,7 @@ class AppRoot extends ConsumerWidget {
       themeMode: themeMode,
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: const WeatherScreen(),
+      home: WeatherScreen(),
     );
   }
 }
