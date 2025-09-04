@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:weather_app/presentation/providers/settings_provider.dart';
@@ -38,8 +38,6 @@ Future<void> main() async {
   final networkInfo = NetworkInfoImpl(connectivity);
   final client = ApiClient(client: http.Client(), networkInfo: networkInfo);
 
-
-
   final remoteDataSource = WeatherRemoteDataSourceImpl(
     apiClient: client,
   );
@@ -55,38 +53,29 @@ Future<void> main() async {
   final getWeather = GetWeather(repository);
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => WeatherProvider(
-            getWeather: getWeather,
-            box: cacheBox,
-
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider(settingsBox),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => SettingsProvider(settingsBox),
-        ),
+    ProviderScope(
+      overrides: [
+        weatherBoxProvider.overrideWithValue(cacheBox),
+        themeBoxProvider.overrideWithValue(settingsBox),
+        settingsBoxProvider.overrideWithValue(settingsBox),
+        getWeatherProvider.overrideWithValue(getWeather),
       ],
       child: const AppRoot(),
     ),
   );
 }
 
-class AppRoot extends StatelessWidget {
+class AppRoot extends ConsumerWidget {
   const AppRoot({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeProvider = context.watch<ThemeProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'Weather Pro',
       debugShowCheckedModeBanner: false,
-      themeMode: themeProvider.themeMode,
+      themeMode: themeMode,
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       home: const WeatherScreen(),
